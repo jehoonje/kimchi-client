@@ -1,8 +1,6 @@
 // src/pages/CategoryPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-// recipes_en.json을 우선 사용
 import recipesData from '../routes/recipes_en.json';
 
 function CategoryPage() {
@@ -11,8 +9,8 @@ function CategoryPage() {
   const [filteredRecipes, setFilteredRecipes] = useState([]);
 
   useEffect(() => {
-    // JSON 파일의 구조가 { "recipes": [ ... ] } 형태라고 가정
-    const allRecipes = recipesData.recipes || [];
+    // JSON 파일의 구조가 단순 배열 [ { ... }, { ... }, ... ] 이라고 가정
+    const allRecipes = recipesData || [];
 
     // rcpSeq 중복 제거하기 위해 사용
     const visited = new Set();
@@ -26,35 +24,35 @@ function CategoryPage() {
 
       switch (categoryName) {
         case 'Soup':
-          // rcpPat2가 "Soup and stew"인 경우
+          // rcpPat2에 "Soup and stew" 라는 단어가 포함되어 있으면 Soup 카테고리로 분류
           if (rcpPat2 && rcpPat2.toLowerCase().includes('soup and stew')) {
             results.push(recipe);
             visited.add(rcpSeq);
           }
           break;
         case 'Noodle':
-          // rcpNm에 "noodles" 단어가 포함되어 있는지
+          // rcpNm에 "noodles" 단어가 포함되어 있으면 Noodle 카테고리로 분류
           if (rcpNm && rcpNm.toLowerCase().includes('noodles')) {
             results.push(recipe);
             visited.add(rcpSeq);
           }
           break;
         case 'Main':
-          // rcpPat2에 "a masterpiece" 단어가 포함되어 있는지
+          // rcpPat2에 "a masterpiece" 라는 단어가 포함되어 있으면 Main 카테고리로 분류
           if (rcpPat2 && rcpPat2.toLowerCase().includes('a masterpiece')) {
             results.push(recipe);
             visited.add(rcpSeq);
           }
           break;
         case 'Banchan':
-          // rcpPat2가 "side dish" 단어가 포함되어 있는지
+          // rcpPat2에 "side dish" 단어가 포함되어 있으면 Banchan 카테고리로 분류
           if (rcpPat2 && rcpPat2.toLowerCase().includes('side dish')) {
             results.push(recipe);
             visited.add(rcpSeq);
           }
           break;
         case 'Dessert':
-          // rcpPat2에 "Dessert" 단어가 포함되어 있는지
+          // rcpPat2에 "dessert" 단어가 포함되어 있으면 Dessert 카테고리로 분류
           if (rcpPat2 && rcpPat2.toLowerCase().includes('dessert')) {
             results.push(recipe);
             visited.add(rcpSeq);

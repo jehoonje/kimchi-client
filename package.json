@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@heroicons/react": "^1.0.6",
     "cra-template": "1.2.0",
     "framer-motion": "^10.18.0",
     "gsap": "^3.12.7",
+    "heroicons": "^2.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.28.2",

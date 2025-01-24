@@ -8,11 +8,15 @@ function RecipeDetail() {
   const [recipe, setRecipe] = useState(null);
 
   useEffect(() => {
-    const allRecipes = recipesData.recipes || [];
+    // JSON 파일이 배열 [ { ... }, { ... }, ... ] 형태라고 가정
+    const allRecipes = recipesData || [];
+
+    // rcpSeq가 일치하는 레시피 찾기
     const found = allRecipes.find((r) => String(r.rcpSeq) === rcpSeq);
     if (found) setRecipe(found);
   }, [rcpSeq]);
 
+  // 레시피가 없으면 메시지 표시
   if (!recipe) {
     return (
       <div className="mt-4">
@@ -21,7 +25,7 @@ function RecipeDetail() {
     );
   }
 
-  // rcpSeq는 제외하고 랜더링하기 위해 구조 분해
+  // rcpSeq는 제외하고 나머지를 순서대로 렌더링
   const { rcpSeq: _, ...rest } = recipe;
 
   return (
