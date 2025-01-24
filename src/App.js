@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import CategoryPage from './pages/CategoryPage';
+import RecipeDetail from './pages/RecipeDetail';
+import Header from './components/Header';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg-white min-h-screen flex justify-center">
+      {/* 최대 폭 50%, 모바일 기본 */}
+      <div className="w-full md:w-1/2 px-2.5">
+        {/* Header 영역 */}
+        <Header />
+        
+        {/* 라우트 정의 */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/category/:categoryName" element={<CategoryPage />} />
+          <Route path="/recipe/:rcpSeq" element={<RecipeDetail />} />
+        </Routes>
+      </div>
     </div>
   );
 }
