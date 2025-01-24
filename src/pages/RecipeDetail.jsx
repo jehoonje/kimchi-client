@@ -6,6 +6,7 @@ import recipesData from '../routes/recipes_en.json';
 function RecipeDetail() {
   const { rcpSeq } = useParams();
   const [recipe, setRecipe] = useState(null);
+  const [mainImageError, setMainImageError] = useState(false);
 
   useEffect(() => {
     // JSON 파일이 배열 [ { ... }, { ... }, ... ] 형태라고 가정
@@ -28,13 +29,59 @@ function RecipeDetail() {
   // rcpSeq는 제외하고 나머지를 순서대로 렌더링
   const { rcpSeq: _, ...rest } = recipe;
 
-  return (
-    <div className="mt-4">
-      <h2 className="text-xl font-semibold mb-2">{rest.rcpNm}</h2>
+  // 이미지 필드 목록 (attFileNoMk 제외)
+  const imageFields = ['attFileNoMain'];
+  const excludedFields = ['attFileNoMk']; // 완전히 제외할 필드
 
-      {/* 나머지 정보를 순서대로 표시 (간단하게 key-value 형태) */}
+  // URL 유효성 검사 함수
+  const isValidUrl = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // 이미지 렌더링 함수
+  const renderImage = (field) => {
+    if (rest[field] && isValidUrl(rest[field])) {
+      const imageUrl = rest[field];
+      console.log(`Rendering image from: ${imageUrl}`); // 디버깅을 위한 콘솔 로그
+
+      return (
+        <div key={field} className="flex justify-center my-4">
+          <img
+            src={imageUrl}
+            alt={`${rest.rcpNm} - ${field}`}
+            className="max-w-full p-12 h-auto rounded-lg "
+            onError={(e) => {
+              console.error(`Failed to load image: ${imageUrl}`);
+              setMainImageError(true); // 에러 상태 업데이트
+              e.target.style.display = 'none'; // 이미지 로딩 실패 시 숨김
+            }}
+          />
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="mt-6">
+      <h2 className="text-xl text-center font-semibold mb-2">{rest.rcpNm}</h2>
+
+      {/* attFileNoMain 이미지 렌더링 */}
+      {renderImage('attFileNoMain')}
+
+      {/* 나머지 정보를 순서대로 표시 (attFileNoMk 제외) */}
       <ul className="space-y-2">
         {Object.entries(rest).map(([key, value]) => {
+          // 이미지 필드 및 제외 필드는 렌더링하지 않음
+          if (imageFields.includes(key) || excludedFields.includes(key)) {
+            return null;
+          }
+
           // manualSteps 배열일 경우 따로 처리
           if (key === 'manualSteps') {
             return (
