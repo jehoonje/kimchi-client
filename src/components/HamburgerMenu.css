@@ -1,0 +1,52 @@
+
+.hamburger {
+  position: relative;
+  display: inline-block;
+
+  .input {
+    position: absolute;
+    opacity: 0;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+  }
+  
+  .input {
+    &:checked ~ .left-bar {
+      transform: translateX(0px);
+    }
+    
+    &:checked + svg .path1 {
+      transform: translate(-7px, 6px) rotate(-45deg);
+      stroke-dashoffset: 42;
+      stroke-dasharray: 27;
+    }
+    
+    &:checked + svg .path3 {
+      transform: translate(-7px, -6px) rotate(45deg);
+      stroke-dashoffset: 69;
+      stroke-dasharray: 27;
+    }
+  }
+  
+  .hamburger-icon {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    margin-right: 10px;
+    display: block;
+    position: relative;
+    stroke: #333;
+    fill: transparent;
+    z-index: 1;
+  }
+  
+  .path1, .path2, .path3 {
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.17, 1.63, 0.87, 1.14);
+    stroke-width: 2.2px;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+  }
+}
