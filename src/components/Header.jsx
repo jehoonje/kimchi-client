@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { MenuIcon, ChevronDownIcon } from "@heroicons/react/outline";
+import { ChevronDownIcon } from "@heroicons/react/outline";
 import gsap from "gsap";
 import "./HamburgerMenu.css";
 
@@ -172,8 +172,7 @@ function Header() {
         onClick={(e) => {
           // 헤더 onClick이 실행되지 않도록 중단
           e.stopPropagation();
-          // 클릭 시 드로어 무조건 닫기
-          setOpenDrawer(false);
+          toggleDrawer();
         }}
         className="p-1"
         aria-label="Toggle Drawer"
