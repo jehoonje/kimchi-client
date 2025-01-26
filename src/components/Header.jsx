@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDownIcon } from "@heroicons/react/outline";
 import gsap from "gsap";
-import "./HamburgerMenu.css";
+import "./HamburgerMenu.scss";
 
 function Header() {
   const [openDrawer, setOpenDrawer] = useState(false);
