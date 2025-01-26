@@ -1,12 +1,20 @@
 // src/pages/RecipeDetail.jsx
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import recipesData from '../routes/recipes_en.json';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import recipesData from "../routes/recipes_en.json";
 
 function RecipeDetail() {
   const { rcpSeq } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [mainImageError, setMainImageError] = useState(false);
+
+  const keyMapping = {
+    rcpNm: "Name",
+    rcpWay2: "Cooking",
+    rcpPat2: "Type",
+    rcpPartsDtls: "Ingredients",
+    rcpNaTip: "Tip",
+  };
 
   useEffect(() => {
     // JSON 파일이 배열 [ { ... }, { ... }, ... ] 형태라고 가정
@@ -30,8 +38,8 @@ function RecipeDetail() {
   const { rcpSeq: _, ...rest } = recipe;
 
   // 이미지 필드 목록 (attFileNoMk 제외)
-  const imageFields = ['attFileNoMain'];
-  const excludedFields = ['attFileNoMk']; // 완전히 제외할 필드
+  const imageFields = ["attFileNoMain"];
+  const excludedFields = ["attFileNoMk"]; // 완전히 제외할 필드
 
   // URL 유효성 검사 함수
   const isValidUrl = (url) => {
@@ -54,11 +62,14 @@ function RecipeDetail() {
           <img
             src={imageUrl}
             alt={`${rest.rcpNm} - ${field}`}
-            className="max-w-full p-12 h-auto rounded-lg "
+            className="max-w-full p-12 h-auto rounded-lg"
+            loading="eager"
+            width={400} // 미리 크기 지정 (예제)
+            height={400}
             onError={(e) => {
               console.error(`Failed to load image: ${imageUrl}`);
-              setMainImageError(true); // 에러 상태 업데이트
-              e.target.style.display = 'none'; // 이미지 로딩 실패 시 숨김
+              setMainImageError(true);
+              e.target.style.display = "none";
             }}
           />
         </div>
@@ -72,21 +83,23 @@ function RecipeDetail() {
       <h2 className="text-xl text-center font-semibold mb-2">{rest.rcpNm}</h2>
 
       {/* attFileNoMain 이미지 렌더링 */}
-      {renderImage('attFileNoMain')}
+      {renderImage("attFileNoMain")}
 
       {/* 나머지 정보를 순서대로 표시 (attFileNoMk 제외) */}
-      <ul className="space-y-2">
+      <ul className="space-y-2 mb-[100px]">
         {Object.entries(rest).map(([key, value]) => {
           // 이미지 필드 및 제외 필드는 렌더링하지 않음
           if (imageFields.includes(key) || excludedFields.includes(key)) {
             return null;
           }
 
+          const displayKey = keyMapping[key] || key;
+
           // manualSteps 배열일 경우 따로 처리
-          if (key === 'manualSteps') {
+          if (key === "manualSteps") {
             return (
               <li key={key}>
-                <strong>{key}:</strong>
+                <strong>{displayKey}:</strong>
                 <ul className="list-disc ml-6">
                   {value.map((step) => (
                     <li key={step.stepIndex}>{step.content}</li>
@@ -98,7 +111,7 @@ function RecipeDetail() {
 
           return (
             <li key={key}>
-              <strong>{key}:</strong> {value}
+              <strong>{displayKey}:</strong> {value}
             </li>
           );
         })}

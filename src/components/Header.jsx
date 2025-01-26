@@ -163,7 +163,7 @@ function Header() {
             handleNavigation("/"); // GSAP 애니메이션 후 이동
           }}
         >
-          <span>Kimchi</span>
+          <span>Random Korean Saturday</span>
         </button>
       </motion.div>
 
@@ -235,9 +235,9 @@ function Header() {
     </motion.header>
   );
 
-  // 드로어 열고 닫는 토글 함수
+  // 📌 **드로어 토글 함수 (닫힐 때도 애니메이션 적용)**
   function toggleDrawer() {
-    setOpenDrawer(!openDrawer);
+    setOpenDrawer((prev) => !prev);
   }
 }
 

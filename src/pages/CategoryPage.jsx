@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import recipesData from '../routes/recipes_en.json';
+import gsap from "gsap";
 
 function CategoryPage() {
   const { categoryName } = useParams();
@@ -66,9 +67,14 @@ function CategoryPage() {
     setFilteredRecipes(results);
   }, [categoryName]);
 
-  const goToDetail = (rcpSeq) => {
-    navigate(`/recipe/${rcpSeq}`);
+  const handleNavigation = (rcpSeq) => {
+    gsap.to(".page-container", {
+      duration: 0.5,
+      opacity: 0,
+      onComplete: () => navigate(`/recipe/${rcpSeq}`), // 경로를 올바르게 설정
+    });
   };
+  
 
   return (
     <div className="mt-4">
@@ -83,7 +89,7 @@ function CategoryPage() {
           <button
             key={recipe.rcpSeq}
             className="block w-full text-left px-4 py-2 mb-2 bg-pink-50 hover:bg-pink-100 rounded"
-            onClick={() => goToDetail(recipe.rcpSeq)}
+            onClick={() => handleNavigation(recipe.rcpSeq)}
           >
             {recipe.rcpNm}
           </button>
