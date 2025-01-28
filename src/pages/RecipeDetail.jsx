@@ -37,9 +37,9 @@ function RecipeDetail() {
   // rcpSeq는 제외하고 나머지를 순서대로 렌더링
   const { rcpSeq: _, ...rest } = recipe;
 
-  // 이미지 필드 목록 (attFileNoMk 제외)
-  const imageFields = ["attFileNoMain"];
-  const excludedFields = ["attFileNoMk"]; // 완전히 제외할 필드
+  // 이미지 필드 목록 (attFileNoMain 제외)
+  const imageFields = ["attFileNoMk"];
+  const excludedFields = ["attFileNoMain"]; // 완전히 제외할 필드
 
   // URL 유효성 검사 함수
   const isValidUrl = (url) => {
@@ -83,9 +83,9 @@ function RecipeDetail() {
       <h2 className="text-xl text-center font-semibold mb-2">{rest.rcpNm}</h2>
 
       {/* attFileNoMain 이미지 렌더링 */}
-      {renderImage("attFileNoMain")}
+      {renderImage("attFileNoMk")}
 
-      {/* 나머지 정보를 순서대로 표시 (attFileNoMk 제외) */}
+      {/* 나머지 정보를 순서대로 표시 (attFileNoMain 제외) */}
       <ul className="space-y-2 mb-[100px]">
         {Object.entries(rest).map(([key, value]) => {
           // 이미지 필드 및 제외 필드는 렌더링하지 않음
