@@ -79,7 +79,7 @@ function Header() {
 
   return (
     <motion.header
-      className="relative mt-4 bg-pink-200 bg-opacity-45 p-2.5 flex justify-between items-center w-full cursor-pointer"
+      className="relative z-[9999] mt-4 bg-pink-200 bg-opacity-45 p-2.5 flex justify-between items-center w-full cursor-pointer"
       style={{
         borderRadius: isDrawerExisted ? "0.5rem 0.5rem 0 0" : "0.5rem", // border-radius 애니메이션 적용
         transition: "border-radius 1s ease-in-out", // border-radius만 애니메이션 적용
