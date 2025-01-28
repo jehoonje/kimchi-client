@@ -3,10 +3,12 @@
   backdrop-filter: blur(10px); /* 주변 블러 처리 */
   margin-top: 20px;
   height: 70vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
 
   // &::before {
   //   content: "";
