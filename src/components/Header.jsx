@@ -12,10 +12,10 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // /recipe/ 로 시작하면 true
+  // /recipe/로 시작하면 true
   const isRecipeDetail = location.pathname.startsWith("/recipe/");
 
-  // 드로어 애니메이션 Variants
+  // 드로어 애니메이션 Variants (기존 scaleY 애니메이션 그대로)
   const drawerVariants = {
     hidden: {
       scaleY: 0,
@@ -58,9 +58,9 @@ function Header() {
     });
   };
 
-  // **드로어 토글 + 헤더 바운스 유지** 함수
+  // 드로어 토글 + 헤더 바운스 유지 함수
   function toggleDrawer() {
-    // 헤더 바운스 애니메이션 (열 때도, 닫을 때도 유지)
+    // 헤더 바운스 애니메이션
     headerControls.start({
       y: [0, -10, 0],
       transition: {
@@ -70,7 +70,7 @@ function Header() {
     });
 
     if (!openDrawer) {
-      // 드로어 열릴 때
+      // 드로어가 열릴 때만 DOM 생성
       setIsDrawerExisted(true);
     }
 
@@ -81,8 +81,8 @@ function Header() {
     <motion.header
       className="relative z-[9999] mt-4 bg-pink-200 bg-opacity-45 p-2.5 flex justify-between items-center w-full cursor-pointer"
       style={{
-        borderRadius: isDrawerExisted ? "0.5rem 0.5rem 0 0" : "0.5rem", // border-radius 애니메이션 적용
-        transition: "border-radius 1s ease-in-out", // border-radius만 애니메이션 적용
+        borderRadius: isDrawerExisted ? "0.5rem 0.5rem 0 0" : "0.5rem",
+        transition: "border-radius 1s ease-in-out",
       }}
       animate={headerControls}
       onClick={toggleDrawer}
@@ -158,7 +158,7 @@ function Header() {
         </button>
       </motion.div>
 
-      {/* 오른쪽 버튼 */}
+      {/* 오른쪽 버튼 (드로어 토글) */}
       <button
         onClick={(e) => {
           e.stopPropagation(); // 헤더 onClick 막기
