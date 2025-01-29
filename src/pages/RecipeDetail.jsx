@@ -51,23 +51,19 @@ function RecipeDetail() {
     }
   };
 
-  // 이미지 렌더링 함수
   const renderImage = (field) => {
     if (rest[field] && isValidUrl(rest[field])) {
-      const imageUrl = rest[field];
-      console.log(`Rendering image from: ${imageUrl}`); // 디버깅을 위한 콘솔 로그
-
       return (
         <div key={field} className="flex justify-center my-4">
           <img
-            src={imageUrl}
+            src={rest[field]}
             alt={`${rest.rcpNm} - ${field}`}
-            className="max-w-full p-12 h-auto rounded-lg"
-            loading="eager"
-            width={400} // 미리 크기 지정 (예제)
+            width={400}
             height={400}
+            className="rounded-lg"
+            loading="lazy"
             onError={(e) => {
-              console.error(`Failed to load image: ${imageUrl}`);
+              console.error(`Image failed to load: ${rest[field]}`);
               setMainImageError(true);
               e.target.style.display = "none";
             }}

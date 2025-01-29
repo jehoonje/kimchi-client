@@ -31,7 +31,7 @@ function Header() {
       opacity: 1,
       transformOrigin: "top",
       transition: {
-        duration: 0.8,
+        duration: 0.5,
         ease: "easeInOut",
       },
     },
@@ -40,7 +40,7 @@ function Header() {
       opacity: 1,
       transformOrigin: "top",
       transition: {
-        duration: 0.8,
+        duration: 0.5,
         ease: "easeInOut",
       },
     },
