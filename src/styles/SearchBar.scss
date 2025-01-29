@@ -56,7 +56,9 @@ $t: .65s;
   text-indent: -100vw; /* 버튼 안의 텍스트 숨기기 */
   transition: $t ease-out;
   cursor: pointer;
-  color: $mag-c; /* currentColor로 돋보기 선 색상 지정 */
+  color: $mag-c; 
+
+  will-change: transform; 
 
   &::before,
   &::after {
@@ -103,6 +105,8 @@ $t: .65s;
   color: #fff;
   font: 1em "Century Gothic", Verdana, Arial, sans-serif;
   transition: $t;
+
+  will-change: transform, clip-path; 
 
   &::placeholder {
     opacity: .5;
