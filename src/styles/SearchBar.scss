@@ -1,7 +1,7 @@
 /* ---------------------------------------
    1) 원본 SCSS 변수 & 초기화
 ---------------------------------------- */
-$btn-d: 3em;
+$btn-d: 40px;
 $txt-w: 4*$btn-d;
 $txt-h: .65*$btn-d;
 $txt-c: #ffeacc;
@@ -19,10 +19,6 @@ $t: .65s;
   margin-top: 50px;
   gap: 10px; /* 돋보기와 검색창 간격 */
 }
-
-/* ---------------------------------------
-   3) 원본 코드: 체크박스 + 라벨 + 검색창
----------------------------------------- */
 
 /* (3-1) 토글 체크박스 */
 [id='search-btn'] {
@@ -47,23 +43,25 @@ $t: .65s;
   overflow: hidden;
   position: relative;
   z-index: 2;
-  margin-left: -.25*$btn-d;
+  margin-left: -10px;
   width: $btn-d; 
   height: $btn-d;
   border-radius: 50%;
   transform: translate(var(--pos, -.45*$txt-w)) rotate(45deg);
   background: hsl(calc(336 - var(--i)*269), calc(77% + var(--i)*2%), calc(49% + var(--i)*13%));
   text-indent: -100vw; /* 버튼 안의 텍스트 숨기기 */
-  transition: $t ease-out;
+  transition: .65s ease-out;
   cursor: pointer;
-  color: $mag-c; 
+  color: $mag-c; /* currentColor로 돋보기 선 색상 지정 */
 
-  will-change: transform; 
+  /* 최소한의 변경: GPU 레이어 분리를 유도 */
+  will-change: transform; /* ★ 추가 */
 
   &::before,
   &::after {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%; 
+    left: 50%;
     margin: -.5*$mag-d; 
     width: $mag-d; 
     height: $mag-d;
@@ -91,25 +89,33 @@ $t: .65s;
   }
 }
 
-/* (3-3) 실제 검색창 */
+/* ---------------------------------------
+   3) 실제 검색창
+---------------------------------------- */
 [id='search-bar'] {
-  margin-right: -.25*$btn-d;
+  margin-right: -10px;
   border: none;
   padding: 0 1em;
   width: $txt-w; 
   height: $txt-h;
   border-radius: $txt-h;
-  transform: translate(var(--pos, .7*$txt-w));
   background: #3f324d;
-  clip-path: inset(-2em var(--pos, 100%) -2em -2em);
   color: #fff;
   font: 1em "Century Gothic", Verdana, Arial, sans-serif;
-  transition: $t;
+  transition: .65s;
+  transform-origin: left center;
+  /* 체크 해제 시 scaleX(0), 체크 시 scaleX(1) */
+  /* 원래 translate()도 함께 쓰고 있었다면 아래와 같이 결합 가능 */
+  transform: translate(var(--pos, .7*$txt-w)) scaleX(calc(var(--j)));
+  /* GPU 레이어 분리 */
+  will-change: transform;
 
-  will-change: transform, clip-path; 
+  /* 필요하다면 3D 변환으로 강제 GPU가속
+     transform: translate(var(--pos, .7*$txt-w)) translateZ(0) scaleX(calc(var(--j)));
+  */
 
   &::placeholder {
-    opacity: .5;
+    opacity: 0.5;
     color: inherit;
     font-size: .875em;
     letter-spacing: 1px;
@@ -121,5 +127,39 @@ $t: .65s;
     box-shadow: 0 0 1em $txt-c, 0 0.75em 0.75em rgba(#000, .1);
     background: $txt-c;
     color: #000;
+  }
+}
+
+/* ---------------------------------------
+   4) 컨테이너 스타일 
+---------------------------------------- */
+.conic-container {
+  background: radial-gradient(circle, #fde9f456 40%, rgba(255, 255, 255, 0.3) 60%);
+  backdrop-filter: blur(10px); /* 주변 블러 처리 */
+  margin-top: 20px;
+  height: 70vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .conic-header {
+    text-align: center;
+
+    .conic-title {
+      margin: 0 auto;
+      width: min(80%, 12em);
+      color: #0000; /* 투명 글자 */
+      -webkit-text-stroke: #e9ff70 0.02em;
+      font-size: 3em;
+      line-height: 1.1;
+      filter: drop-shadow(1px 1px 2px #000);
+    }
+    .conic-subtitle {
+      margin-top: 1em;
+      display: block;
+      opacity: 0.8;
+    }
   }
 }
