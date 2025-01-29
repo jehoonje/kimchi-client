@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDownIcon } from "@heroicons/react/outline";
 import gsap from "gsap";
@@ -8,49 +7,20 @@ import "./HamburgerMenu.scss";
 function Header() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isDrawerExisted, setIsDrawerExisted] = useState(false);
-  const headerControls = useAnimation();
+  const [pendingPath, setPendingPath] = useState(null); // 드로어 닫힘 후 이동할 경로
   const navigate = useNavigate();
   const location = useLocation();
 
-  // /recipe/로 시작하면 true
+  // /recipe/ 로 시작하면 true
   const isRecipeDetail = location.pathname.startsWith("/recipe/");
 
-  // 드로어 애니메이션 Variants (기존 scaleY 애니메이션 그대로)
-  const drawerVariants = {
-    hidden: {
-      scaleY: 0,
-      opacity: 1,
-      transformOrigin: "top",
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
-    },
-    visible: {
-      scaleY: 1,
-      opacity: 1,
-      transformOrigin: "top",
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
-    },
-    exit: {
-      scaleY: 0,
-      opacity: 1,
-      transformOrigin: "top",
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
-    },
-  };
+  // === 레퍼런스 ===
+  const headerRef = useRef(null); // 헤더 전체
+  const drawerRef = useRef(null); // 드로어 컨테이너
+  const leftBlockRef = useRef(null); // 왼쪽(햄버거+타이틀) 블록
 
-  // 페이지 이동 (GSAP 페이드 아웃)
-  const handleNavigation = (path) => {
-    if (openDrawer) {
-      setOpenDrawer(false);
-    }
+  // (1) 페이지 전환 시 GSAP 페이드 아웃
+  const doFadeOut = (path) => {
     gsap.to(".page-container", {
       duration: 0.5,
       opacity: 0,
@@ -58,41 +28,102 @@ function Header() {
     });
   };
 
-  // 드로어 토글 + 헤더 바운스 유지 함수
-  function toggleDrawer() {
-    // 헤더 바운스 애니메이션
-    headerControls.start({
-      y: [0, -10, 0],
-      transition: {
+  // (2) 헤더 바운스 애니메이션: y: [0, -10, 0]
+  const bounceHeader = () => {
+    gsap.fromTo(
+      headerRef.current,
+      { y: 0 },
+      {
+        keyframes: { y: [0, -10, 0] },
         duration: 0.5,
         ease: "easeInOut",
-      },
-    });
+      }
+    );
+  };
+
+  // (3) 드로어 열기/닫기 토글
+  const toggleDrawer = () => {
+    // 헤더 바운스
+    bounceHeader();
 
     if (!openDrawer) {
-      // 드로어가 열릴 때만 DOM 생성
-      setIsDrawerExisted(true);
+      setIsDrawerExisted(true); // DOM 마운트
     }
-
     setOpenDrawer((prev) => !prev);
-  }
+  };
+
+  // (4) 페이지 이동을 트리거하는 함수
+  const handleNavigation = (path) => {
+    // 드로어가 열려 있다면 => 먼저 닫고, 닫히면 페이드 아웃
+    if (openDrawer) {
+      setPendingPath(path);
+      setOpenDrawer(false);
+    } else {
+      // 이미 닫혀 있으면 바로 페이드 아웃
+      doFadeOut(path);
+    }
+  };
+
+  // === 드로어 열림/닫힘 애니메이션: openDrawer state가 바뀔 때마다 실행 ===
+  useEffect(() => {
+    if (!drawerRef.current) return;
+
+    if (openDrawer) {
+      // (a) 열기: scaleY 0 -> 1
+      gsap.fromTo(
+        drawerRef.current,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          transformOrigin: "top",
+          duration: 0.5,
+          ease: "easeInOut",
+          onStart: () => {
+            // 혹시 display가 none 상태라면
+            drawerRef.current.style.display = "block";
+          },
+        }
+      );
+    } else {
+      // (b) 닫기: scaleY 1 -> 0
+      gsap.to(drawerRef.current, {
+        scaleY: 0,
+        transformOrigin: "top",
+        duration: 0.5,
+        ease: "easeInOut",
+        onComplete: () => {
+          setIsDrawerExisted(false); // DOM 언마운트
+          if (pendingPath) {
+            // 이 시점에서 페이지 전환 페이드 아웃
+            doFadeOut(pendingPath);
+            setPendingPath(null);
+          }
+        },
+      });
+    }
+  }, [openDrawer, pendingPath]);
+
+  // === 왼쪽(햄버거+타이틀) 영역의 opacity도 Framer Motion 대신 간단히 style로 ===
+  const leftBlockStyle = {
+    opacity: openDrawer ? 0 : 1,
+    transition: "opacity 0.3s",
+  };
+
+  // === border-radius도 기존처럼 애니메이션 (CSS transition) ===
+  const headerBorderRadius = isDrawerExisted ? "0.5rem 0.5rem 0 0" : "0.5rem";
 
   return (
-    <motion.header
+    <header
+      ref={headerRef}
       className="relative z-[9999] mt-4 bg-pink-200 bg-opacity-45 p-2.5 flex justify-between items-center w-full cursor-pointer"
       style={{
-        borderRadius: isDrawerExisted ? "0.5rem 0.5rem 0 0" : "0.5rem",
+        borderRadius: headerBorderRadius,
         transition: "border-radius 1s ease-in-out",
       }}
-      animate={headerControls}
       onClick={toggleDrawer}
     >
-      {/* 왼쪽 햄버거 + 중앙 타이틀 */}
-      <motion.div
-        className="flex items-center gap-2"
-        animate={{ opacity: openDrawer ? 0 : 1 }}
-        transition={{ duration: 0.3 }}
-      >
+      {/* 왼쪽 (햄버거 + 타이틀) */}
+      <div ref={leftBlockRef} className="flex items-center gap-2" style={leftBlockStyle}>
         {/* 햄버거 버튼 */}
         <label
           className="hamburger"
@@ -104,12 +135,7 @@ function Header() {
             }
           }}
         >
-          <input
-            type="checkbox"
-            className="input"
-            checked={isRecipeDetail}
-            readOnly
-          />
+          <input type="checkbox" className="input" checked={isRecipeDetail} readOnly />
           <svg
             className="hamburger-icon"
             width="28px"
@@ -156,9 +182,9 @@ function Header() {
         >
           Random Korean Saturday
         </button>
-      </motion.div>
+      </div>
 
-      {/* 오른쪽 버튼 (드로어 토글) */}
+      {/* 오른쪽 버튼(드로어 토글) */}
       <button
         onClick={(e) => {
           e.stopPropagation(); // 헤더 onClick 막기
@@ -174,51 +200,51 @@ function Header() {
         />
       </button>
 
-      {/* 드로어 */}
-      <AnimatePresence onExitComplete={() => setIsDrawerExisted(false)}>
-        {openDrawer && (
-          <motion.div
-            className="drawer-menu absolute left-0 top-full w-full text-center bg-pink-100 bg-opacity-90 shadow-md p-4 flex flex-col gap-2 origin-top overflow-hidden"
-            variants={drawerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onClick={(e) => e.stopPropagation()}
+      {/* 드로어: openDrawer일 때만 DOM 렌더링 */}
+      {isDrawerExisted && (
+        <div
+          ref={drawerRef}
+          className="drawer-menu absolute left-0 top-full w-full text-center bg-pink-100 bg-opacity-90 shadow-md p-4 flex flex-col gap-2 origin-top overflow-hidden"
+          style={{
+            // 초기 상태 (mount 시 바로 scaleY 애니메이션 시작)
+            scaleY: 0,
+            transformOrigin: "top",
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="hover:underline text-2xl my-2 text-center"
+            onClick={() => handleNavigation("/category/Soup")}
           >
-            <button
-              className="hover:underline text-2xl my-2 text-center"
-              onClick={() => handleNavigation("/category/Soup")}
-            >
-              Soup
-            </button>
-            <button
-              className="hover:underline text-2xl my-2 text-center"
-              onClick={() => handleNavigation("/category/Noodle")}
-            >
-              Noodle
-            </button>
-            <button
-              className="hover:underline text-2xl my-2 text-center"
-              onClick={() => handleNavigation("/category/Main")}
-            >
-              Main
-            </button>
-            <button
-              className="hover:underline text-2xl my-2 text-center"
-              onClick={() => handleNavigation("/category/Banchan")}
-            >
-              Banchan
-            </button>
-            <button
-              className="hover:underline text-2xl my-2 text-center"
-              onClick={() => handleNavigation("/category/Dessert")}
-            >
-              Dessert
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+            Soup
+          </button>
+          <button
+            className="hover:underline text-2xl my-2 text-center"
+            onClick={() => handleNavigation("/category/Noodle")}
+          >
+            Noodle
+          </button>
+          <button
+            className="hover:underline text-2xl my-2 text-center"
+            onClick={() => handleNavigation("/category/Main")}
+          >
+            Main
+          </button>
+          <button
+            className="hover:underline text-2xl my-2 text-center"
+            onClick={() => handleNavigation("/category/Banchan")}
+          >
+            Banchan
+          </button>
+          <button
+            className="hover:underline text-2xl my-2 text-center"
+            onClick={() => handleNavigation("/category/Dessert")}
+          >
+            Dessert
+          </button>
+        </div>
+      )}
+    </header>
   );
 }
 
