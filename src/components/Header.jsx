@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDownIcon } from "@heroicons/react/outline";
-import gsap from "gsap";
+// import { ChevronDownIcon } from "@heroicons/react/outline"; // 기존 import 주석 처리
+import ChevronDownIcon from "@heroicons/react/outline/ChevronDownIcon"; // 아이콘 필요한 곳에서만 import
+// import gsap from "gsap"; // 주석 처리 (원본 코드 보존용)
 import "./HamburgerMenu.scss";
 
 function Header() {
@@ -19,24 +20,63 @@ function Header() {
   const drawerRef = useRef(null); // 드로어 컨테이너
   const leftBlockRef = useRef(null); // 왼쪽(햄버거+타이틀) 블록
 
-  // (1) 페이지 전환 시 GSAP 페이드 아웃
-  const doFadeOut = (path) => {
-    gsap.to(".page-container", {
-      duration: 0.5,
-      opacity: 0,
-      onComplete: () => navigate(path),
+  // ===============================
+  // [추가] GSAP를 동적 로드하기 위한 Ref
+  // ===============================
+  const gsapRef = useRef(null);
+
+  // ===============================
+  // [추가] 마운트 시점에 GSAP 비동기 로드
+  // ===============================
+  useEffect(() => {
+    import("gsap").then((mod) => {
+      gsapRef.current = mod.default;
     });
+  }, []);
+
+  // (1) 페이지 전환 시 GSAP 페이드 아웃
+  // ======================================
+  // 원본 함수에서는 gsap.to()를 사용했지만,
+  // 지금은 gsapRef.current를 통해 동적 로드된 gsap 사용
+  // ======================================
+  const doFadeOut = (path) => {
+    // gsap.to(".page-container", {
+    //   duration: 0.5,
+    //   opacity: 0,
+    //   onComplete: () => navigate(path),
+    // });
+    if (gsapRef.current) {
+      gsapRef.current.to(".page-container", {
+        duration: 0.5,
+        opacity: 0,
+        onComplete: () => navigate(path),
+      });
+    } else {
+      // 만약 아직 gsap가 로드되지 않았다면 즉시 페이지 이동
+      navigate(path);
+    }
   };
 
   // (2) 헤더 바운스 애니메이션: y: [0, -10, 0]
   const bounceHeader = () => {
-    gsap.fromTo(
+    // gsap.fromTo(
+    //   headerRef.current,
+    //   { y: 0 },
+    //   {
+    //     keyframes: { y: [0, -10, 0] },
+    //     duration: 0.8,
+    //     ease: "power1.inOut",
+    //   }
+    // );
+
+    if (!gsapRef.current) return;
+    gsapRef.current.fromTo(
       headerRef.current,
       { y: 0 },
       {
         keyframes: { y: [0, -10, 0] },
-        duration: 0.5,
-        ease: "easeInOut",
+        duration: 0.8,
+        ease: "power1.inOut",
       }
     );
   };
@@ -70,36 +110,68 @@ function Header() {
 
     if (openDrawer) {
       // (a) 열기: scaleY 0 -> 1
-      gsap.fromTo(
-        drawerRef.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          transformOrigin: "top",
-          duration: 0.5,
-          ease: "easeInOut",
-          onStart: () => {
-            // 혹시 display가 none 상태라면
-            drawerRef.current.style.display = "block";
-          },
-        }
-      );
+      // gsap.fromTo(
+      //   drawerRef.current,
+      //   { scaleY: 0 },
+      //   {
+      //     scaleY: 1,
+      //     transformOrigin: "top",
+      //     duration: 0.5,
+      //     ease: "power2.inOut",
+      //   }
+      // );
+      if (gsapRef.current) {
+        gsapRef.current.fromTo(
+          drawerRef.current,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            transformOrigin: "top",
+            duration: 0.5,
+            ease: "power2.inOut",
+          }
+        );
+      }
     } else {
       // (b) 닫기: scaleY 1 -> 0
-      gsap.to(drawerRef.current, {
-        scaleY: 0,
-        transformOrigin: "top",
-        duration: 0.5,
-        ease: "easeInOut",
-        onComplete: () => {
-          setIsDrawerExisted(false); // DOM 언마운트
-          if (pendingPath) {
-            // 이 시점에서 페이지 전환 페이드 아웃
-            doFadeOut(pendingPath);
-            setPendingPath(null);
-          }
-        },
-      });
+      // gsap.to(drawerRef.current, {
+      //   scaleY: 0,
+      //   transformOrigin: "top",
+      //   duration: 0.5,
+      //   ease: "power2.inOut",
+      //   onComplete: () => {
+      //     setIsDrawerExisted(false); // DOM 언마운트
+      //     if (pendingPath) {
+      //       // 이 시점에서 페이지 전환 페이드 아웃
+      //       doFadeOut(pendingPath);
+      //       setPendingPath(null);
+      //     }
+      //   },
+      // });
+
+      if (gsapRef.current) {
+        gsapRef.current.to(drawerRef.current, {
+          scaleY: 0,
+          transformOrigin: "top",
+          duration: 0.5,
+          ease: "power2.inOut",
+          onComplete: () => {
+            setIsDrawerExisted(false); // DOM 언마운트
+            if (pendingPath) {
+              // 이 시점에서 페이지 전환 페이드 아웃
+              doFadeOut(pendingPath);
+              setPendingPath(null);
+            }
+          },
+        });
+      } else {
+        // 만약 gsap가 아직 로드 안 됐다면 즉시 DOM 언마운트 처리
+        setIsDrawerExisted(false);
+        if (pendingPath) {
+          doFadeOut(pendingPath);
+          setPendingPath(null);
+        }
+      }
     }
   }, [openDrawer, pendingPath]);
 
