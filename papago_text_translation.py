@@ -76,7 +76,7 @@ def translate_recipe_object(recipe_obj):
 
 def main():
     # 1) 원본 JSON (한국어) 로드
-    with open("recipes.json", "r", encoding="utf-8") as f:
+    with open("recipes_kr.json", "r", encoding="utf-8") as f:
         data = json.load(f)
     
     if not isinstance(data, list):
@@ -96,7 +96,7 @@ def main():
         time.sleep(0.2)  # 0.2초 휴식 (필요시 조정)
 
     # 2) 결과 저장
-    with open("recipes_en.json", "w", encoding="utf-8") as f:
+    with open("recipes_en_final.json", "w", encoding="utf-8") as f:
         json.dump(translated_data, f, ensure_ascii=False, indent=2)
 
     print("Done: recipes_en.json created.")
